@@ -1,66 +1,104 @@
 Symulator windy z Arduino
 
-Projekt przedstawia działający model windy sterowanej za pomocą silnika krokowego, czujników pięter i przycisków wyboru piętra, z wyświetlaczem LCD pokazującym aktualny stan windy.
+Model trójpoziomowej windy sterowanej mikrokontrolerem Arduino UNO.
+Projekt demonstruje obsługę silnika krokowego, czujników pięter i przycisków wywołania, a także komunikację z wyświetlaczem LCD 16x2 informującym o aktualnym stanie windy.
 
-Kod napisany został w języku C++ dla platformy Arduino z użyciem bibliotek Stepper.h i LiquidCrystal.h.
+⚙️ Opis działania
 
-Opis działania:
-
-Winda symuluje ruch pomiędzy trzema piętrami:
+Symulator odwzorowuje działanie prawdziwej windy, poruszającej się pomiędzy trzema piętrami:
 
 Każde piętro ma czujnik pozycji (np. krańcówkę lub fotokomórkę),
 
-Każde piętro posiada przycisk wywołania windy,
+Dla każdego piętra przewidziano przycisk wywołania,
 
-Ruch realizowany jest przez silnik krokowy, który przemieszcza windę w górę lub w dół,
+Ruch windy realizowany jest przez silnik krokowy 28BYJ-48 sterowany przez ULN2003,
 
-Wyświetlacz LCD 16x2 pokazuje aktualne piętro oraz komunikaty o ruchu.
+Na wyświetlaczu LCD pojawiają się komunikaty o ruchu i aktualnym piętrze.
 
-Kiedy użytkownik naciśnie przycisk piętra, program:
+Po naciśnięciu przycisku piętra program:
 
-Dodaje żądanie do kolejki (kolejka[]),
+Dodaje żądanie do kolejki zadań,
 
 Wybiera najbliższe piętro do odwiedzenia,
 
 Uruchamia silnik w odpowiednim kierunku,
 
-Zatrzymuje się po wykryciu czujnika danego piętra,
+Zatrzymuje windę po wykryciu czujnika danego piętra,
 
-Wyświetla komunikat na LCD i czeka chwilę na ewentualne nowe zgłoszenia.
+Wyświetla komunikat na ekranie LCD i czeka na kolejne zgłoszenia.
 
-Wykorzystane komponenty:
-Arduino UNO - Mikrokontroler sterujący całością
-Silnik krokowy 28BYJ-48 + sterownik ULN2003 - Realizuje ruch windy
-Wyświetlacz LCD 16x2 (HD44780)	Pokazuje stan windy
-3 przyciski - Wywołanie windy na poszczególne piętra
-3 krańcówki - Określają aktualne piętro
-Zasilanie 5V - Dla silnika, czujników i wyświetlacza
+🧩 Wykorzystane komponenty
 
-Struktura kodu
+🧠 Arduino UNO - Sterowanie całym układem
+🔁 Silnik krokowy 28BYJ-48 + ULN2003 - Ruch windy góra/dół
+🖥️ Wyświetlacz LCD 16x2 (HD44780) - Pokazuje stan windy
+🔘 3 przyciski - Wywołanie windy na poszczególne piętra
+⚙️ 3 krańcówki - Detekcja aktualnego piętra
+🔌 Zasilanie 5V	Dla silnika, czujników i LCD
 
-Główne funkcje programu:
 
-dodaj_pietro(pietro) - Dodaje żądanie piętra do kolejki
-usun_pietro_z_kolejki(pietro) - Usuwa obsłużone piętro
-sprawdz_przyciski() - Odczytuje stan przycisków z debounce
-obsluz_przyjazd(pietro, kierunek) - Obsługuje zatrzymanie na piętrze
-wybierz_nastepne_pietro() - Wybiera najbliższe piętro z kolejki
-jedz_do_pietra() - Realizuje faktyczny ruch windy
+🧠 Struktura kodu
 
-Wyświetlacz LCD
+Najważniejsze funkcje programu:
 
-Na ekranie pojawiają się komunikaty:
+dodaj_pietro(pietro) – dodaje żądanie piętra do kolejki
 
-Start windy... — podczas uruchamiania,
+usun_pietro_z_kolejki(pietro) – usuwa obsłużone piętro
 
-Jedzie na pietro: X — w trakcie ruchu,
+sprawdz_przyciski() – sprawdza przyciski (z debounce)
 
-Winda na pietrze: X — po dotarciu do celu.
+obsluz_przyjazd(pietro, kierunek) – obsługuje zatrzymanie na piętrze
+
+wybierz_nastepne_pietro() – wybiera najbliższe piętro z kolejki
+
+jedz_do_pietra() – realizuje ruch windy
+
+🖥️ Komunikaty na wyświetlaczu LCD
+
+Uruchamianie - Start windy...
+Ruch windy - Jedzie na pietro: X
+Postój -Winda na pietrze: X
+
 
 Schemat połączeń:
 
-Pin Arduino	Komponent		Opis
-8, 9, 10, 11	Silnik krokowy		Sterowanie uzwojeniami
-2–7		Wyświetlacz LCD		Sterowanie danymi i RS/E
-1, 12, 13	Przyciski		Wywołanie pięter
-A0, A1, A2	Czujniki		Detekcja pozycji windy
+Pin D1 → Przycisk piętro 1 (przycisk_pietro1)
+
+Pin D2 → LCD RS
+
+Pin D3 → LCD EN (E)
+
+Pin D4 → LCD D4
+
+Pin D5 → LCD D5
+
+Pin D6 → LCD D6
+
+Pin D7 → LCD D7
+
+Pin D8 → Silnik krokowy – wejście IN1 (ULN2003)
+
+Pin D9 → Silnik krokowy – wejście IN3 (ULN2003)
+
+Pin D10 → Silnik krokowy – wejście IN2 (ULN2003)
+
+Pin D11 → Silnik krokowy – wejście IN4 (ULN2003)
+
+Pin D12 → Przycisk piętro 2 (przycisk_pietro2)
+
+Pin D13 → Przycisk piętro 3 (przycisk_pietro3)
+
+
+Analogowe wejścia
+
+Pin A0 → Czujnik piętro 1 (czujnik_pietro1)
+
+Pin A1 → Czujnik piętro 2 (czujnik_pietro2)
+
+Pin A2 → Czujnik piętro 3 (czujnik_pietro3)
+
+Pin A3 → (wolny / rezerwowy)
+
+Pin A4 → (wolny / rezerwowy)
+
+Pin A5 → (wolny / rezerwowy)
